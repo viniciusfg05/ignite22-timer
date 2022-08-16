@@ -1,0 +1,6 @@
+{
+  "extends": "@rocketseat/eslint-config/react"
+}
+
+// npx eslint src --ext .ts,.tsx
+// executar condigo para sabe os erros da padrao eslint

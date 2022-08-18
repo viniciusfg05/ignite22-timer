@@ -1,3 +1,7 @@
+# Pesquisar mais sobre a propriedade/ Compobebte <Outlet /> do react-router-dom
+
+# Bibliotecas de validações: yup, joi e zod 
+
 # Tipando uma biblioteca
     Temos a possibilidade de tipar uma biblioteca
         
@@ -30,7 +34,7 @@
     }
 ~~~
 
-# StyledComponent - Usando um component Base reaproveitando o código 
+# StyledComponent - Usando um component Base reaproveitando o código (No styled-components, como podemos utilizar outros componentes estilizados como base para novos componentes)
 ~~~js
     const BaseInput = styled.input`
         background: transparent;
@@ -63,3 +67,105 @@ Para tirmos a flecha de input vamos add a propriedade css no input (Funciona ape
 # OBS sobre estilização em table - border-collapse: collapse; 
 Quando vamos colocar uma margin entre as colunas da tabela css vai conta como duar bordas, ou seja 1px em cada bordas, usando
 "border-collapse: collapse;" o css conta como apenas uma borda 
+
+
+# Para criar uma propriedade no styledcomponets
+
+Crio um propriedade e passo como generico.
+No codigo abaixo estamos criando um thema variavel para propriedadem STATUS_COLORS define que a propriedade vai ter determina cor, baseado do DefaultTheme.
+
+~~~~js
+const STATUS_COLORS = {
+  yellow: 'yellow-500',
+  red: 'red-500',
+  green: 'green-500',
+} as const
+
+interface StatusProps {
+  statusColor: 'yellow' | 'red' | 'green';
+  statusColor: 'yellow' | 'red' | 'green';
+statusColor: keyof typeof STATUS_COLORS; // pega as chaves de yellow red green de STATUS_COLORS | antes statusColor: 'yellow' | 'red' | 'green';
+}
+export const Status = styled.span<StatusProps>`
+    background: ${(props) => props.theme[STATUS_COLORS[props.statusColor]]};;
+  }
+`
+~~~~
+
+# as const oq significa?
+Quando passomos um objeto informando que yellow: 'yellow-500' o TS entende que 'yellow' é um string qualquer, que pode varias, usando o 'as cont' ele entende que 'yellow' é 'yellow-500'
+
+~~~~js
+const STATUS_COLORS = {
+  yellow: 'yellow-500',
+  red: 'red-500',
+  green: 'green-500',
+} as const
+~~~~
+
+
+##################################
+
+# FORMULARIOS
+
+## Controlled VS Uncontrolled
+    * Controlled: Fazemos um State() para ter a atualização de cada tecla digitada pelo usuario "Onchange". Mantemos um tempo real a informação digitada.
+
+    * Uncontrolled: Buscamos a informação do valor somente quando precisar dela. Criando um function que executa após do submit, e a informação digitada é pega pelo "event.target.task.value". Lembrando que .task.value o "task" é o id do input.
+
+## Integrando o react-hook-form no projeto
+    * "register" é um função que retorna basicamente as propriedade do input como por ex. Onchange, OnBlur, OnFocus e etc. Para lidar com as validações. Como existe varios metodo vamos add um spreedOperacion no componet de input
+
+    *valueAsNumber um propriedade do register para tranformar string em number 
+
+~~~tsx
+  const { register, handleSubmit } = useForm()
+
+  return (
+    <TaskInput
+    {...register('task')} // no   parao input, tira o id que    registerj
+    ||
+    {...register('minutesAmount', { valueAsNumber: true })} 
+    />
+  )
+~~~
+
+    * "handleSubmit": para usarmos o handleSubmit, vamos criar um função que será executada como uma propriedade da função hadleSubmit 
+
+~~~tsx
+  function handleCreateNewCyrcle(data: any) {
+    // data recebe os dados do input
+  }
+
+  return (
+    <form onSubmit={handleSubmit(handleCreateNewCyrcle)} />
+  )
+~~~
+
+    * "watch": serve como o Onchange, para obervar a digitação no input
+
+~~~tsx
+    const isInputFilled = watch('task')
+~~~
+
+### Trabalhando com validações no react-hook-form
+    Por padrão o react-hook-form não trabalha com validações, pois já existem bibliotecas que fazem isso. Neste projeto vamos ultilizar a "zod".
+
+    * "@hookform/resolvers": E Para ultilizarmos essa bibiloteca vamos precisar instalar outra bibiloteca, chamada "@hookform/resolvers", que nos permite integrar a as bibiloteca de validações com react-hook-form.
+
+~~~tsx
+    import { zodResolver } from '@hookform/resolvers/zod';
+    import * as zod from 'zod' // usamos ess sitaxe, quando a bibioteca não exporta default
+
+    const newCycleFormValidationSchema = zod.object({
+  //Validando um objeto por isso, zod.object
+      task: zod.string().min(5, "Informe a tarefa"),
+      minutesAmount: zod.number().min(5, 'Mens. Error').max(60, 'Mens. Error')
+    })
+
+    export function Home() {
+        const { register, handleSubmit, watch, formState } = useForm({
+          resolver: zodResolver(newCycleFormValidationSchema)
+        }) 
+    }
+~~~

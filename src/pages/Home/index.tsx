@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod' // usamos ess sitaxe, quando a bibioteca não exporta default
 import { CountDownContainer, FormContainer, HomeContainer, MunutesAmountInput, Separator, StartCountDownButton, TaskInput } from "./styles";
+import { useState } from "react";
 
 const newCycleFormValidationSchema = zod.object({
   //Validando um objeto por isso, zod.object
@@ -10,14 +11,36 @@ const newCycleFormValidationSchema = zod.object({
   minutesAmount: zod.number().min(5, 'Ciclo precisar ser no mínimo 5 minutos').max(60, 'Ciclo precisar ser no mínimo 60 minutos')
 })
 
+type NewCycleFormProps = zod.infer<typeof newCycleFormValidationSchema>
+
+interface CycleProps {
+  id: string;
+  task: string;
+  minutesAmount: number;
+
+}
+
 export function Home() {
-  const { register, handleSubmit, watch } = useForm({
-    resolver: zodResolver(newCycleFormValidationSchema)
+  const [ cycles, setCicles ] = useState<CycleProps[]>([])
+
+
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormProps>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    }
   }) 
 
-  function handleCreateNewCyrcle(data: any) {
+  function handleCreateNewCyrcle(data: NewCycleFormProps) {
     // data recebe os dados do input
-    console.log(data);
+    const newCycle: CycleProps = {
+      id: String(new Date().getTime()), //Data atual convertida em numero
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+
+    setCicles((state) => [...cycles, newCycle])
   }
 
   const isInputFilled = watch('task')

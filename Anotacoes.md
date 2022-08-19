@@ -166,6 +166,57 @@ const STATUS_COLORS = {
     export function Home() {
         const { register, handleSubmit, watch, formState } = useForm({
           resolver: zodResolver(newCycleFormValidationSchema)
-        }) 
+        })
+
+        // console no erros
+        console.log(formState.errors);
+
     }
+~~~
+
+# Integrando o TS com as validações
+
+No useForm podemos passar valores padroes inicial para o input em questão a propriedade "defaultValues"
+Para ter uma integração com o TS vamos passar a interface como "<>"
+
+~~~tsx
+      const { register, handleSubmit, watch } = useForm<NewCycleFormProps>({
+        resolver: zodResolver(newCycleFormValidationSchema),
+        defaultValues: {
+          task: '',
+          minutesAmount: 0,
+        }
+      }) 
+~~~
+
+# Funcionabilidade do ZOD: "infer"
+
+No zod, conseguimos quando vazemos a validação do input como por ex. 
+~~~tsx
+    const newCycleFormValidationSchema = zod.object({
+  //Validando um objeto por isso, zod.object
+      task: zod.string().min(5, "Informe a tarefa"),
+      minutesAmount: zod.number().min(5, 'Mens. Error').max(60, 'Mens. Error')
+    })
+~~~
+O zod altomaticamente entende que 'task' e 'minutesAmount' é um propriedade. 
+Para isso vamos usar a propriedade "infer"
+
+~~~tsx
+type NewCycleFormProps = zod.infer<typeof newCycleFormValidationSchema>
+~~~
+
+Sempre que queremos referencia uma variaver JS dentro do TS precisamos usar o "typeof"
+
+
+# Alterção de valores do useState
+
+Sempre que vamos atualizar um valor que depende do valor anterior precisamos usar o formato de () =>
+
+~~~tsx
+// Errado
+setCicles([...cycles, newCycle])
+
+// Forma corrta 
+setCicles((state) => [...cycles, newCycle])
 ~~~

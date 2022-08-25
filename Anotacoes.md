@@ -218,5 +218,56 @@ Sempre que vamos atualizar um valor que depende do valor anterior precisamos usa
 setCicles([...cycles, newCycle])
 
 // Forma corrta 
-setCicles((state) => [...cycles, newCycle])
+setCicles((state) => [...state, newCycle])
+~~~
+
+# Usando o SetInterval 
+
+Como o setInterval não é preciso, vamos compara a data que foi criado o Cycle com a data atual, assim descobrindo quando tempo se passaram: Faremos isso com a ajuda da biblioteca "date-fns"
+
+~~~js
+import { differenceInSeconds } from 'date-fns' //calcula a diferença de duas data em segundos
+
+  useEffect(() => {
+    // Se tiver um ciclo ativo, vou da um setInterfvalo
+    if(activeCycle) {
+      setInterval(() => {
+        // diferença da data atual com a data do startCicle
+        setAmountSecondsPassed(differenceInSeconds( new Date(), activeCycle.startDate ))
+
+      }, 1000)
+    }
+  }, [activeCycle])
+~~~
+
+
+# Sobre useEffect
+
+O useEffect pode tem uma função de retorna que no caso do cicle quando criamos um novo ciclo em seguida, ele nunca resetará as informações ateriores. Vamos ultilizar essas função de returno para essa finalidade
+
+~~~js
+  useEffect(() => {
+    let interval: number;
+
+    if(activeCycle) {
+      interval = setInterval(() => {
+        setAmountSecondsPassed(differenceInSeconds( new Date(), activeCycle.startDate ))
+
+      }, 1000)
+    }
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [activeCycle])
+~~~
+
+# Converter um variavel undefined | Valor em booleano
+~~~js
+  <TaskInput
+    list="taskSuggestions"
+    disabled={!!activeCycle}
+    placeholder="Dê um nome para seu projeto"
+    {...register('task')} // nome para o input, tira o id que o register  
+  />
 ~~~

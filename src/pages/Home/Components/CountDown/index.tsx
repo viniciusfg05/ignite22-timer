@@ -5,9 +5,7 @@ import { CountDownContainer, Separator } from "./styles";
 
 
 export function CountDown() {
-  const { activeCycle, activeCycleId, markCurrentCycleAsFinished} = useContext(CycleContext)
-
-  const [ amountSecondsPassed, setAmountSecondsPassed ] = useState(0) // Armazena o total de segundo que passo
+  const { activeCycle, setSecondsPassed, amountSecondsPassed , markCurrentCycleAsFinished} = useContext(CycleContext)
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 // Convert os minutos em segundos
 
@@ -23,12 +21,12 @@ export function CountDown() {
         if(secondsDifference >= totalSeconds) {
           markCurrentCycleAsFinished()
 
-          setAmountSecondsPassed(totalSeconds)
+          setSecondsPassed(totalSeconds)
           clearInterval(interval)
 
         } else {
           // se ainda não completou o total de segundo eu atualizado os segundos restantes
-          setAmountSecondsPassed(secondsDifference)
+          setSecondsPassed(secondsDifference)
         }
 
 

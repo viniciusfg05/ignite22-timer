@@ -1,28 +1,14 @@
 import { MunutesAmountInput, TaskInput, FormContainer } from "./styles";
-import * as zod from 'zod' // usamos ess sitaxe, quando a bibioteca não exporta default
-import { useForm } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
-
-
-
-const newCycleFormValidationSchema = zod.object({
-  //Validando um objeto por isso, zod.object
-  task: zod.string().min(5, "Informe a tarefa"),
-  minutesAmount: zod.number().min(1, 'Ciclo precisar ser no mínimo 5 minutos').max(60, 'Ciclo precisar ser no mínimo 60 minutos')
-})
-
-type NewCycleFormProps = zod.infer<typeof newCycleFormValidationSchema>
+import { useContext } from "react";
+import { CycleContext } from "../..";
 
 export function NewCycleForm() {
-  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormProps>({
-    resolver: zodResolver(newCycleFormValidationSchema),
-    defaultValues: {
-      task: '',
-      minutesAmount: 0,
-    }
-  })
+  const { activeCycle} = useContext(CycleContext)
+  const { register } = useFormContext()
 
-    return (
+  return (
         <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput

@@ -1,63 +1,56 @@
 import { HandPalm, Play } from "phosphor-react";
-import { useForm } from "react-hook-form";
 import { HomeContainer, StartCountDownButton, StopCountDownButton } from "./styles";
 import { createContext, useEffect, useState } from "react";
 import { differenceInSeconds } from 'date-fns'
 import { NewCycleForm } from "./Components/NewCicleForm";
 import { CountDown } from "./Components/CountDown";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as zod from 'zod' // usamos ess sitaxe, quando a bibioteca não exporta default
 
-interface CycleProps {
-  id: string;
-  task: string;
-  minutesAmount: number;
-  startDate: Date;
-  interruptedDate?: Date;
-  FinashedDate?: Date;
-}
 
-interface CycleContextType {
-  activeCycle: CycleProps | undefined;
-  activeCycleId: string | null;
-  markCurrentCycleAsFinished: () => void;
-}
+
+
+
 
 export const CycleContext = createContext({} as CycleContextType)
 
+const newCycleFormValidationSchema = zod.object({
+  //Validando um objeto por isso, zod.object
+  task: zod.string().min(5, "Informe a tarefa"),
+  minutesAmount: zod.number().min(1, 'Ciclo precisar ser no mínimo 5 minutos').max(60, 'Ciclo precisar ser no mínimo 60 minutos')
+})
+
+type NewCycleFormProps = zod.infer<typeof newCycleFormValidationSchema>
+
 
 export function Home() { 
-  const [ cycles, setCicles ] = useState<CycleProps[]>([])
-  const [ activeCycleId, setActiveCycleId ] = useState<string | null>(null)
+  const useFormProps = useForm<NewCycleFormProps>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    }
+  })
 
-  const activeCycle = cycles.find((cycles) => cycles.id === activeCycleId)
+  const { handleSubmit, watch, reset } = useFormProps
 
-  function markCurrentCycleAsFinished() {
-    setCicles((state) =>
-    state.map(cycles => {
-      if(cycles.id === activeCycleId) {
-        return { ...cycles, FinashedDate: new Date() }
-      } else {
-        return cycles
-      }
-    })
-  )
+  function handleCreateNewCyrcle(data: NewCycleFormProps) {
+    const id = String(new Date().getTime())
+    // data recebe os dados do input
+    const newCycle: CycleProps = {
+      id, //Data atual convertida em numero
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date()
+    }
+
+    setCicles((state) => [...state, newCycle])
+    setActiveCycleId(id)
+    setAmountSecondsPassed(0)
+
+    reset()
   }
-
-  // function handleCreateNewCyrcle(data: NewCycleFormProp s) {
-  //   const id = String(new Date().getTime())
-  //   // data recebe os dados do input
-  //   const newCycle: CycleProps = {
-  //     id, //Data atual convertida em numero
-  //     task: data.task,
-  //     minutesAmount: data.minutesAmount,
-  //     startDate: new Date()
-  //   }
-
-  //   setCicles((state) => [...state, newCycle])
-  //   setActiveCycleId(id)
-  //   setAmountSecondsPassed(0)
-
-  //   reset()
-  // }
 
   function handleInterruptCycle() {
     
@@ -78,14 +71,16 @@ export function Home() {
 
 
 
-  // const isInputFilled = watch('task')
-  // const isSubmitDisabled = !isInputFilled
+  const isInputFilled = watch('task')
+  const isSubmitDisabled = !isInputFilled
 
   return (
     <HomeContainer>
-      <form /*</HomeContainer>onSubmit={handleSubmit(handleCreateNewCyrcle)} action=""*/>
-        <CycleContext.Provider value={{ activeCycle, activeCycleId, markCurrentCycleAsFinished}} >
-          {/* <NewCycleForm /> */}
+      <form onSubmit={handleSubmit(handleCreateNewCyrcle)} action="">
+
+          <FormProvider {...useFormProps}>
+            <NewCycleForm />
+          </FormProvider>
 
           <CountDown />
 
@@ -95,12 +90,11 @@ export function Home() {
               Interromper
             </StopCountDownButton>
           ) : (
-            <StartCountDownButton /*disabled={isSubmitDisabled}*/ type="submit">
+            <StartCountDownButton disabled={isSubmitDisabled} type="submit">
               <Play size={24} />
               Começar
             </StartCountDownButton>
           ) }
-        </CycleContext.Provider>
 
       </form> 
     </HomeContainer>

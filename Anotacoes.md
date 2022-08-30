@@ -174,6 +174,31 @@ const STATUS_COLORS = {
     }
 ~~~
 
+# React-hook-form Context
+
+React-hook-form oferece um contexto proprio. Para isso vamos criar uma const e desestruturar o useForm com a constante criada.
+Após isso vamos usar a função FormProvider do react-hook-form para passar como spreedOperacion a constante de useForm.
+
+Para pegar os dados do provider vamos usar a função useFormContext e desestruturar a propriedade que queremos. 
+
+Home.tsx
+~~~js
+  const useFormProps = useForm<NewCycleFormProps>()
+
+  const { handleSubmit, watch, reset } = useFormProps
+
+  <FormProvider {...useFormProps}>
+    <NewCycleForm />
+  </FormProvider>
+~~~
+NewCycleForm.tsx
+~~~js
+  const { register } = useFormContext()
+
+  <TaskInput {...register('task')} /*nome para o input, tira o id quregister*/  />
+~~~
+
+
 # Integrando o TS com as validações
 
 No useForm podemos passar valores padroes inicial para o input em questão a propriedade "defaultValues"
@@ -271,3 +296,4 @@ O useEffect pode tem uma função de retorna que no caso do cicle quando criamos
     {...register('task')} // nome para o input, tira o id que o register  
   />
 ~~~
+

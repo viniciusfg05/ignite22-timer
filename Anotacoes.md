@@ -297,3 +297,42 @@ O useEffect pode tem uma função de retorna que no caso do cicle quando criamos
   />
 ~~~
 
+### Quando queremos enviar uma função setfuncao do useState, vamos criar uma função que atualizar ele e passar a função por contexto 
+
+~~~tsx  
+  function setSecondsPassed(seconds: number) {
+    setAmountSecondsPassed(seconds)
+  }
+
+  <CycleContext.Provider value={{ setSecondsPassed }} />
+~~~  
+
+# Context - Abservações sobre o assunto
+
+Vamos criar um arquivo que vai conter todos os arquivos "CyclesContextProvider" do contexto e passasr para o App.tsx
+
+~~~js
+App.tsx
+  <CyclesContextProvider>
+    <Router />
+  </CyclesContextProvider>
+  ~~~
+
+  Children - Quando criamos o contexto e passamos para o App.tsx, terá outro componente dentro do contexto que criamos, no caso o "Router", e quando passamos ao dentro do contextProvider "CyclesContextProvider", nos precisamos falr dentro do return, a onde o componente filho "Router" vai ser acoplado, chamamos isso de children.
+
+  Error: O tipo '{ children: Element; }' não tem propriedades em comum com o tipo 'IntrinsicAttributes'.
+
+~~~js
+interface CycleContextProviderProps {
+  children: ReactNode // qualquer html valido
+}
+
+  export function CyclesContextProvider({ children }: CycleContextProviderProps) {
+
+      return (
+        <CycleContext.Provider value={{ }} >
+            { children }
+        </CycleContext.Provider>
+    )
+  }
+~~~

@@ -336,3 +336,53 @@ interface CycleContextProviderProps {
     )
   }
 ~~~
+
+# Reducers
+
+## Funcionabilidade "useReducer" do react
+
+  O useReducer é muito parecido com o useState, ele armazena informações, mas para casos mais complexo, custoso para a aplicação. É como criar um lugar fixo da função de alteração é passar essa informação para os componentes que necessitam, sem a necessitadade de repetir o msm codigo 
+
+### Criand um reducer
+
+  Recebe como paramentro uma função `() => {}` e como segundo paramentro ele recebe um valor inicial `,   []`
+  Detro da função `(state: CycleProps[], action: any)) => {}, []` 
+    state: valor em tempo real 
+    action: Ação que o usuario quer executar
+
+  como a action servirá para executar determinada ação, a função que antes era "setCicles" vamos mudar   para "dispatch", pois não vamos usar a função "set" para fazer alterações e sim para chamar a action `const [cycles, dispatch] = useReducer(state: CycleProps[], action: any)) => {}, []`
+
+  Ao usar o `dispatch()` precisamos passar alguma informações que possamos distiguir uma action da outra, no caso abaixo o "type" e dentro de payLond ficará a informação salva
+  ~~~tsx
+    dispatch({
+      type: 'MARK_CURRENT_CYCLE_AS_FINISHED',
+        payLond: {
+          activeCycleId
+        }
+    })
+  ~~~
+
+  ~~~tsx
+    O console.log no "action" retornará o objeto a seguir
+      {type: 'ADD_NEW_CYCLE', payLond: {…}}
+      payLond:
+        newCycle:
+          id: "1661987551581"
+          minutesAmount: 1
+          startDate: Wed Aug 31 2022 20:12:31 GMT-0300 (Horário Padrão de Brasília) {}
+          task: "Projeto 1"
+  ~~~
+
+ ~~~tsx
+    const [cycles, dispatch] = useReducer((state: CycleProps[], action: any) => {
+
+      if(action.type === 'ADD_NEW_CYCLE') {
+        return [...state, action.payLond.newCycle]
+      }
+
+    return state
+    }, [])
+~~~
+
+### Salvando um objeto no Reducer
+

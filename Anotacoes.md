@@ -4,6 +4,8 @@
 
 # Tipando uma biblioteca
     Temos a possibilidade de tipar uma biblioteca
+
+# Site para ver erros do Typescript https://ts-error-translator.vercel.app/
         
 ~~~javascript
     import 'styled-components'
@@ -343,9 +345,25 @@ interface CycleContextProviderProps {
 
   O useReducer é muito parecido com o useState, ele armazena informações, mas para casos mais complexo, custoso para a aplicação. É como criar um lugar fixo da função de alteração é passar essa informação para os componentes que necessitam, sem a necessitadade de repetir o msm codigo 
 
-### Criand um reducer
+### Criando um reducer
 
   Recebe como paramentro uma função `() => {}` e como segundo paramentro ele recebe um valor inicial `,   []`
+
+  ## Passando valores inicial em formato de Objeto 
+  OBS: Erro: ao passarmos varias informações para o state, ao inves de passarmos o valor inicial com um array vazio "[]", valor passar desta forma
+
+  ~~~tsx
+    interface CycleState {
+      cycles: CycleProps[];
+      activeCycleId: string | null;
+    }
+    
+    const [cycles, dispatch] = useReducer((state: CycleState, action: any) => { } , { 
+     cycles: [],
+     activeCycle: null,
+    })
+  ~~~
+
   Detro da função `(state: CycleProps[], action: any)) => {}, []` 
     state: valor em tempo real 
     action: Ação que o usuario quer executar

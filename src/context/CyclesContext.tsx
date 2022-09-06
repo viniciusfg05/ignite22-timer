@@ -1,14 +1,7 @@
 import { createContext, ReactNode, useReducer, useState } from "react";
 import { NewCycleForm } from "../pages/Home/Components/NewCicleForm";
-
-interface CycleProps {
-  id: string;
-  task: string;
-  minutesAmount: number;
-  startDate: Date;
-  interruptedDate?: Date;
-  FinashedDate?: Date;
-}
+import { ActionTypes, addNewCycleAction, handleInterruptCycleAction, markCurrentCycleAsFinishedAction } from "../Reducers/cycles/actions";
+import { CycleProps, CyclesReducer } from "../Reducers/cycles/reducer";
 
 interface CreateNewCycleProps {
   task: string;
@@ -30,55 +23,12 @@ interface CycleContextProviderProps {
   children: ReactNode; // qualquer html valido
 }
 
-interface CycleState {
-  cycles: CycleProps[];
-  activeCycleId: string | null;
-}
+
 
 export const CycleContext = createContext({} as CycleContextType);
 
 export function CyclesContextProvider({ children }: CycleContextProviderProps) {
-  const [cyclesState, dispatch] = useReducer((state: CycleState, action: any) => {
-    switch (action.type) {
-      case 'ADD_NEW_CYCLE':
-        return {
-          ...state,
-          cycles: [...state.cycles, action.payLond.newCycle],
-          activeCycleId: action.payLond.newCycle.id // setando o id como ciclo ativo
-        }
-      case 'INTERRUPTED_CURENT_CYCLE':
-        return {
-          ...state,
-          cycles: state.cycles.map((cycles) => {
-            // se o ciclo ativo for
-            if (cycles.id === state.activeCycleId) {
-              // retornar todos os dados e add a infomração de interruptedDate
-              return { ...cycles, interruptedDate: new Date() };
-            } else {
-              return cycles;
-            }
-          }),
-          activeCycleId: null,
-        }
-      case 'MARK_CURRENT_CYCLE_AS_FINISHED':
-        return {
-          ...state,
-          cycles: state.cycles.map((cycles) => {
-            // se o ciclo ativo for
-            if (cycles.id === state.activeCycleId) {
-              // retornar todos os dados e add a infomração de interruptedDate
-              return { ...cycles, FinashedDate: new Date() };
-            } else {
-              return cycles;
-            }
-          }),
-          activeCycleId: null,
-        }
-      default:
-        return state
-    }
-    
-  }, {
+  const [cyclesState, dispatch] = useReducer(CyclesReducer, {
     // state
     cycles: [],
     activeCycleId: null,
@@ -95,12 +45,7 @@ export function CyclesContextProvider({ children }: CycleContextProviderProps) {
   }
 
   function markCurrentCycleAsFinished() {
-    dispatch({
-    type: 'MARK_CURRENT_CYCLE_AS_FINISHED',
-      payLond: {
-        activeCycleId
-      }
-    })
+    dispatch(markCurrentCycleAsFinishedAction(activeCycleId))
   }
 
   function createNewCycle(data: CreateNewCycleProps) {
@@ -115,22 +60,12 @@ export function CyclesContextProvider({ children }: CycleContextProviderProps) {
 
     setAmountSecondsPassed(0);
 
-    dispatch({
-      type: 'ADD_NEW_CYCLE',
-      payLond: {
-        newCycle,
-      }
-    })
+    dispatch(addNewCycleAction(newCycle));
 
   }
 
   function handleInterruptCycle() {
-    dispatch({
-      type: 'INTERRUPTED_CURENT_CYCLE',
-      payLond: {
-        activeCycleId
-      }
-    })
+    dispatch(handleInterruptCycleAction(activeCycleId))
 
   }
 
